@@ -1,6 +1,9 @@
 # detect-new-script-action
 
-Comment detected new scripts.
+Adds a comment to the PR when a file is added under the following directory.
+
+- `script/`
+- `scripts/`
 
 ## Usage:
 
