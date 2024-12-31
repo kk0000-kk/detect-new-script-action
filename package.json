@@ -1,7 +1,7 @@
 {
   "name": "detect-new-script-action",
   "description": "Comment detected new scripts.",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "author": "kk0000-kk",
   "private": true,
   "homepage": "https://github.com/kk0000-kk/detect-new-script-action",
