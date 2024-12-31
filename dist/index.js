@@ -29919,29 +29919,29 @@ const github_1 = __nccwpck_require__(3228);
 const run = async () => {
     try {
         const githubToken = (0, core_1.getInput)('githubToken');
-        const baseBranch = (0, core_1.getInput)('baseBranch');
-        const langueage = (0, core_1.getInput)('langueage');
+        const language = (0, core_1.getInput)('language');
         const octokit = (0, github_1.getOctokit)(githubToken);
         const prNumber = github_1.context.payload.pull_request?.number;
         if (!prNumber)
             throw new Error('Invalid PR number');
         const repo = github_1.context.repo.repo;
         const owner = github_1.context.repo.owner;
+        const baseBranch = github_1.context.payload.pull_request?.base.ref;
         const compareResult = await octokit.rest.repos.compareCommits({
             owner,
             repo,
             base: baseBranch,
             head: github_1.context.sha
         });
-        const newFiles = compareResult.data.files?.filter(file => file.status === 'added' &&
+        const newScripts = compareResult.data.files?.filter(file => file.status === 'added' &&
             (file.filename.includes('script/') ||
                 file.filename.includes('scripts/'))) || [];
-        if (newFiles.length > 0) {
+        if (newScripts.length > 0) {
             await octokit.rest.issues.createComment({
                 owner,
                 repo,
                 issue_number: prNumber,
-                body: commentBody(langueage, newFiles.map(file => file.filename))
+                body: commentBody(language, newScripts.map(file => file.filename))
             });
         }
     }

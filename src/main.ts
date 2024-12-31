@@ -4,7 +4,7 @@ import { context, getOctokit } from '@actions/github'
 export const run = async (): Promise<void> => {
   try {
     const githubToken = getInput('githubToken')
-    const langueage = getInput('langueage')
+    const language = getInput('language')
     const octokit = getOctokit(githubToken)
 
     const prNumber = context.payload.pull_request?.number
@@ -34,7 +34,7 @@ export const run = async (): Promise<void> => {
         repo,
         issue_number: prNumber,
         body: commentBody(
-          langueage,
+          language,
           newScripts.map(file => file.filename)
         )
       })

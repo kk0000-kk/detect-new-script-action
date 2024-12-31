@@ -9,7 +9,7 @@ The action works only with `pull_request` event.
 ### Inputs
 
 - githubToken - The GITHUB_TOKEN secret.
-- langueage - The language of message.
+- language - The language of message.
 
 ## Example
 

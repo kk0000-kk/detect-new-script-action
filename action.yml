@@ -6,7 +6,7 @@ inputs:
   githubToken:
     description: The GITHUB_TOKEN secret.
     required: true
-  langueage:
+  language:
     description: The language of message.
     required: false
     default: jp
