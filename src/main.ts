@@ -1,26 +1,61 @@
-import * as core from '@actions/core'
-import { wait } from './wait'
+import { getInput, setFailed } from '@actions/core'
+import { context, getOctokit } from '@actions/github'
 
-/**
- * The main function for the action.
- * @returns {Promise<void>} Resolves when the action is complete.
- */
-export async function run(): Promise<void> {
+export const run = async (): Promise<void> => {
   try {
-    const ms: string = core.getInput('milliseconds')
+    const githubToken = getInput('githubToken')
+    const langueage = getInput('langueage')
+    const octokit = getOctokit(githubToken)
 
-    // Debug logs are only output if the `ACTIONS_STEP_DEBUG` secret is true
-    core.debug(`Waiting ${ms} milliseconds ...`)
+    const prNumber = context.payload.pull_request?.number
+    if (!prNumber) throw new Error('Invalid PR number')
+    const repo = context.repo.repo
+    const owner = context.repo.owner
+    const baseBranch = context.payload.pull_request?.base.ref
 
-    // Log the current timestamp, wait, then log the new timestamp
-    core.debug(new Date().toTimeString())
-    await wait(parseInt(ms, 10))
-    core.debug(new Date().toTimeString())
+    const compareResult = await octokit.rest.repos.compareCommits({
+      owner,
+      repo,
+      base: baseBranch,
+      head: context.sha
+    })
 
-    // Set outputs for other workflow steps to use
-    core.setOutput('time', new Date().toTimeString())
+    const newScripts =
+      compareResult.data.files?.filter(
+        file =>
+          file.status === 'added' &&
+          (file.filename.includes('script/') ||
+            file.filename.includes('scripts/'))
+      ) || []
+
+    if (newScripts.length > 0) {
+      await octokit.rest.issues.createComment({
+        owner,
+        repo,
+        issue_number: prNumber,
+        body: commentBody(
+          langueage,
+          newScripts.map(file => file.filename)
+        )
+      })
+    }
   } catch (error) {
-    // Fail the workflow run if an error occurs
-    if (error instanceof Error) core.setFailed(error.message)
+    if (error instanceof Error) setFailed(error.message)
+  }
+}
+
+const commentBody = (language: string, filenames: string[]) => {
+  const filenamesComment = `${filenames.map(filename => `- ${filename}`).join('\n')}`
+  switch (language) {
+    case 'jp':
+      return `# 以下のスクリプトが追加されています！実行を忘れないようにしましょう！\n
+      ${filenamesComment}`
+
+    case 'en':
+      return `# The following scripts have been added! Don't forget to run them!\n
+        ${filenamesComment}`
+
+    default:
+      return ''
   }
 }

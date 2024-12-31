@@ -1,16 +1,16 @@
 {
-  "name": "typescript-action",
-  "description": "GitHub Actions TypeScript template",
+  "name": "detect-new-script-action",
+  "description": "Comment detected new scripts.",
   "version": "0.0.0",
-  "author": "",
+  "author": "kk0000-kk",
   "private": true,
-  "homepage": "https://github.com/actions/typescript-action",
+  "homepage": "https://github.com/kk0000-kk/detect-new-script-action",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/actions/typescript-action.git"
+    "url": "git+https://github.com/kk0000-kk/detect-new-script-action.git"
   },
   "bugs": {
-    "url": "https://github.com/actions/typescript-action/issues"
+    "url": "https://github.com/kk0000-kk/detect-new-script-action/issues"
   },
   "keywords": [
     "actions",
@@ -21,7 +21,7 @@
     ".": "./dist/index.js"
   },
   "engines": {
-    "node": ">=21"
+    "node": ">=22"
   },
   "scripts": {
     "bundle": "npm run format:write && npm run package",
@@ -67,7 +67,8 @@
     ]
   },
   "dependencies": {
-    "@actions/core": "^1.11.1"
+    "@actions/core": "^1.11.1",
+    "@actions/github": "^6.0.0"
   },
   "devDependencies": {
     "@github/local-action": "^2.2.1",
