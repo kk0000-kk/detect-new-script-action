@@ -29926,12 +29926,14 @@ const run = async () => {
             throw new Error('Invalid PR number');
         const repo = github_1.context.repo.repo;
         const owner = github_1.context.repo.owner;
-        const baseBranch = github_1.context.payload.pull_request?.base.ref;
+        const { base, head } = getBaseAndHeadRevision(github_1.context);
+        if (!base || !head)
+            return;
         const compareResult = await octokit.rest.repos.compareCommits({
             owner,
             repo,
-            base: baseBranch,
-            head: github_1.context.sha
+            base,
+            head
         });
         const newScripts = compareResult.data.files?.filter(file => file.status === 'added' &&
             (file.filename.includes('script/') ||
@@ -29951,6 +29953,21 @@ const run = async () => {
     }
 };
 exports.run = run;
+const getBaseAndHeadRevision = (context) => {
+    if (context.payload.action === 'opened') {
+        const base = context.payload.pull_request?.base.ref;
+        const head = context.sha;
+        return { base, head };
+    }
+    else if (context.payload.action === 'synchronize') {
+        const base = context.payload.before;
+        const head = context.payload.after;
+        return { base, head };
+    }
+    else {
+        return { base: null, head: null };
+    }
+};
 const commentBody = (language, filenames) => {
     const filenamesComment = `${filenames.map(filename => `- ${filename}`).join('\n')}`;
     switch (language) {

@@ -1,5 +1,6 @@
 import { getInput, setFailed } from '@actions/core'
 import { context, getOctokit } from '@actions/github'
+import type { Context } from '@actions/github/lib/context'
 
 export const run = async (): Promise<void> => {
   try {
@@ -11,13 +12,14 @@ export const run = async (): Promise<void> => {
     if (!prNumber) throw new Error('Invalid PR number')
     const repo = context.repo.repo
     const owner = context.repo.owner
-    const baseBranch = context.payload.pull_request?.base.ref
+    const { base, head } = getBaseAndHeadRevision(context)
+    if (!base || !head) return
 
     const compareResult = await octokit.rest.repos.compareCommits({
       owner,
       repo,
-      base: baseBranch,
-      head: context.sha
+      base,
+      head
     })
 
     const newScripts =
@@ -41,6 +43,20 @@ export const run = async (): Promise<void> => {
     }
   } catch (error) {
     if (error instanceof Error) setFailed(error.message)
+  }
+}
+
+const getBaseAndHeadRevision = (context: Context) => {
+  if (context.payload.action === 'opened') {
+    const base = context.payload.pull_request?.base.ref
+    const head = context.sha
+    return { base, head }
+  } else if (context.payload.action === 'synchronize') {
+    const base = context.payload.before
+    const head = context.payload.after
+    return { base, head }
+  } else {
+    return { base: null, head: null }
   }
 }
 
