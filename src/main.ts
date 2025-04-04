@@ -64,8 +64,9 @@ const commentBody = (language: string, filenames: string[]) => {
   const filenamesComment = `${filenames.map(filename => `- ${filename}`).join('\n')}`
   switch (language) {
     case 'jp':
-      return `# 以下のスクリプトが追加されています！実行を忘れないようにしましょう！\n
-      ${filenamesComment}`
+      return `# 以下のスクリプトが追加されています！実行を忘れないようにしましょう！\n\n
+      ${filenamesComment}\n
+      # スクリプト実行による副作用についても要チェック！！`
 
     case 'en':
       return `# The following scripts have been added! Don't forget to run them!\n
